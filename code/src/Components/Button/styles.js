@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 
 export const Button = styled.button`
-    width: 20rem;
-    padding: 1rem 0rem;
+    padding: 1rem;
     margin-top: 3rem;
     display: flex;
     justify-content: center;

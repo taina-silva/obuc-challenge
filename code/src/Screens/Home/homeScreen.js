@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React from 'react';
 import {useNavigate} from 'react-router-dom';
 import doceMaria from '../../assets/doce_maria.png'; 
 import PrincipalButton from '../../Components/Button/principalButton';

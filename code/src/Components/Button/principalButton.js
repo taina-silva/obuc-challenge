@@ -1,12 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Button
 } from './styles';
 
-function PrincipalButton({text, onClick}) {
+function PrincipalButton(props) {
     return (
-      <Button onClick={onClick} >{text}</Button>
+      <Button onClick={props.onClick} >{props.text}</Button>
     );
 }
+
+PrincipalButton.propTypes = {
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
 
 export default PrincipalButton;
