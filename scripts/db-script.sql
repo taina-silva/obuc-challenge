@@ -70,35 +70,35 @@ $$
 DECLARE
    _elem text; 
 BEGIN
-	insert into jobs (jobTitle, salary) values (jobTitle, salary);
+	insert into obuc.jobs (jobTitle, salary) values (jobTitle, salary);
 	
 	FOREACH _elem IN ARRAY activities
 	   	LOOP 
-		  	insert into jobs_activities (job, activity) 
+		  	insert into obuc.jobs_activities (job, activity) 
 				values (jobTitle, _elem);
 	   	END LOOP;
 	   
 	FOREACH _elem IN ARRAY benefits
 	   	LOOP 
-		  	insert into jobs_benefits (job, benefit) 
+		  	insert into obuc.jobs_benefits (job, benefit) 
 				values (jobTitle, _elem);
 	   	END LOOP;
 	   
 	FOREACH _elem IN ARRAY process_steps
 		LOOP 
-		  	insert into jobs_process_steps (job, step) 
+		  	insert into obuc.jobs_process_steps (job, step) 
 				values (jobTitle, _elem);
 	   	END LOOP;
 	   
 	 FOREACH _elem IN ARRAY necessary_skills
 	 	LOOP 
-		  	insert into jobs_necessary_skills (job, skill) 
+		  	insert into obuc.jobs_necessary_skills (job, skill) 
 				values (jobTitle, _elem);
 	   	END LOOP;
 	   
 	  FOREACH _elem IN ARRAY experience_needed
 	  	LOOP 
-		  	insert into jobs_experience_needed (job, experience) 
+		  	insert into obuc.jobs_experience_needed (job, experience) 
 				values (jobTitle, _elem);
 	   	END LOOP;   
 END;

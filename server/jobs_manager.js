@@ -9,10 +9,8 @@ const db_pool = new Pool({
   port: 5432,
 });
 
-const get_all_jobs = () => {
+const get_all_jobs = (queryText) => {
   return new Promise(function(resolve, reject) {
-      const queryText = `SELECT email, username, full_name, created_at FROM morpheus.users`;
-
       db_pool.query(queryText, (error, results) => {
       if (error) {
         reject(error)
@@ -25,30 +23,31 @@ const get_all_jobs = () => {
 
 const add_job = (body) => {
   const { jobTitle, salary, activities, benefits, processSteps, necessarySkills, experienceNeeded } = body;
-  console.log(parseFloat(salary));
-  console.log(typeof parseFloat(salary));
 
-  getStringFromArray(array) {
-    const string = 'ARRAY[';
+  function getStringFromArray(array) {
+    var string = 'ARRAY[';
     Array.from(array).forEach((elem) => {
-      string = string + `'${elem}'`;
+      string = string + elem;
+      if(Array.from(array).indexOf(elem) !== Array.from(array).length - 1) string = string + ', '
     })
 
-    return string;
+    return string.trimEnd() + ']::text[]'; 
   }
 
   return new Promise(function(resolve, reject) {
-    const sql = `SELECT obuc.add_job (
-                    ${SqlString.escape(jobTitle)},
-                    ${parseFloat(salary)},
-                    ${SqlString.escape('ARRAY' + activities + '::text[]')},
-                    ${SqlString.escape('ARRAY' + benefits + '::text[]')},
-                    ${SqlString.escape('ARRAY' + processSteps + '::text[]')},
-                    ${SqlString.escape('ARRAY' + necessarySkills + '::text[]')},
-                    ${SqlString.escape('ARRAY' + experienceNeeded + '::text[]')}
-                  )`
+    const sql = `SELECT obuc.add_job ($1, $2, $3, $4, $5, $6, $7)`;
 
-    db_pool.query(sql, (error, results) => {
+    const params = [
+      jobTitle, 
+      parseFloat(salary),
+      activities,
+      benefits,
+      processSteps,
+      necessarySkills,
+      experienceNeeded,
+    ];
+
+    db_pool.query(sql, params, (error, results) => {
       if (error) {
         reject(error);
         console.log(error);
