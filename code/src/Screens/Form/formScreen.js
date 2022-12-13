@@ -7,13 +7,14 @@ import * as Yup from 'yup';
 import PrincipalButton from '../../Components/Button/principalButton';
 import MultiItemsInput from '../../Components/Input/multiItems';
 import JobPdfDocument from '../../Components/Pdf/pdfDocument';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 import { pdf } from '@react-pdf/renderer';
 import {
+    Title,
     Container,
+    MultiItemsInputsContainer,
     Column,
-    Row,
+    FirstSection,
     ModalBox,
     ModalDescription,
     ModalTitle,
@@ -113,24 +114,39 @@ function FormScreen() {
         getSet[id]();
     }
 
-    const generatePdfDocument = async (jobTitle, salary) => {
+    const addJob = async (jobTitle, salary) => {
+        const jobSpecifications = {
+            jobTitle: jobTitle,
+            salary: salary,
+            activities: activities,
+            benefits: benefits,
+            processSteps: processSteps,
+            necessarySkills: necessarySkills,
+            experienceNeeded: experienceNeeded,
+        };
+        
+        fetch('http://localhost:3001/jobs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jobSpecifications),
+        })
+        .then((response) => {
+            // generatePdfDocument(jobSpecifications).then(() => {});
+        });
+    };
+
+    const generatePdfDocument = async (jobSpecifications) => {
         const blob = await pdf((
-            <JobPdfDocument jobSpecifications={{
-                    jobTitle: jobTitle,
-                    salary: salary,
-                    activities: activities,
-                    benefits: benefits,
-                    processSteps: processSteps,
-                    necessarySkills: necessarySkills,
-                    experienceNeeded: experienceNeeded,
-                }}
+            <JobPdfDocument jobSpecifications={jobSpecifications}
             />
         )).toBlob();
         saveAs(blob, 'formulario-vaga.pdf');
     };
 
     return (
-        <Container>
+        <>
             <Formik
                 initialValues = {{
                     jobTitle: '',
@@ -158,7 +174,8 @@ function FormScreen() {
                         return (
                             <Form onSubmit={handleSubmit}>
                                 <Container>
-                                    <Row>
+                                    <Title>Formulário para divulgação de vaga</Title>
+                                    <FirstSection>
                                         <Column>
                                             <InputTitle>Título do cargo</InputTitle>
                                             <FormInput
@@ -168,9 +185,7 @@ function FormScreen() {
                                                 value={values.jobTitle}
                                                 showError={touched.jobTitle && errors.jobTitle}
                                             />
-                                            {touched.jobTitle && errors.jobTitle && (
-                                                <ErrorSpan>{errors.jobTitle}</ErrorSpan>
-                                            )}
+                                            <ErrorSpan showError={touched.jobTitle && errors.jobTitle}>{errors.jobTitle}</ErrorSpan>
                                         </Column>
 
                                         <Column>
@@ -183,97 +198,97 @@ function FormScreen() {
                                                 groupSeparator='.'
                                                 decimalsLimit={2}
                                             />
-                                            {touched.salary && errors.salary && (
-                                                <ErrorSpan>{errors.salary}</ErrorSpan>
-                                            )}
+                                            <ErrorSpan showError={touched.salary && errors.salary}>{errors.salary}</ErrorSpan>
                                         </Column>
-                                    </Row>                            
+                                    </FirstSection>  
 
-                                    <MultiItemsInput 
-                                        title='Atividades a serem exercidas'
-                                        getFormInput={() => {
-                                            return <FormInput
-                                                type='text' name='activities' id='activities'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.activities}
-                                                showError={touched.activities && errors.activities}
-                                            />
-                                        }}
-                                        itemsList={activities}
-                                        addItem={() => addItem('activities', values.activities)}
-                                        removeItem={(value) => removeItem('activities', value)}
-                                        errorDescription={touched.activities && errors.activities ? errors.activities : ''}
-                                    />
+                                    <MultiItemsInputsContainer>                        
+                                        <MultiItemsInput 
+                                            title='Atividades a serem exercidas'
+                                            getFormInput={() => {
+                                                return <FormInput
+                                                    type='text' name='activities' id='activities'
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    value={values.activities}
+                                                    showError={touched.activities && errors.activities}
+                                                />
+                                            }}
+                                            itemsList={activities}
+                                            addItem={() => addItem('activities', values.activities)}
+                                            removeItem={(value) => removeItem('activities', value)}
+                                            errorDescription={touched.activities && errors.activities ? errors.activities : ''}
+                                        />
 
-                                    <MultiItemsInput 
-                                        title='Benefícios do cargo'
-                                        getFormInput={() => {
-                                            return <FormInput
-                                                type='text' name='benefits' id='benefits'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.benefits}
-                                                showError={touched.benefits && errors.benefits}
-                                            />
-                                        }}
-                                        itemsList={benefits}
-                                        addItem={() => addItem('benefits', values.benefits)}
-                                        removeItem={(value) => removeItem('benefits', value)}
-                                        errorDescription={touched.benefits && errors.benefits ? errors.benefits : ''}
-                                    />
+                                        <MultiItemsInput 
+                                            title='Benefícios do cargo'
+                                            getFormInput={() => {
+                                                return <FormInput
+                                                    type='text' name='benefits' id='benefits'
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    value={values.benefits}
+                                                    showError={touched.benefits && errors.benefits}
+                                                />
+                                            }}
+                                            itemsList={benefits}
+                                            addItem={() => addItem('benefits', values.benefits)}
+                                            removeItem={(value) => removeItem('benefits', value)}
+                                            errorDescription={touched.benefits && errors.benefits ? errors.benefits : ''}
+                                        />
 
-                                    <MultiItemsInput 
-                                        title='Etapas do processo'
-                                        getFormInput={() => {
-                                            return <FormInput
-                                                type='text' name='processSteps' id='processSteps'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.processSteps}
-                                                showError={touched.processSteps && errors.processSteps}
-                                            />
-                                        }}
-                                        itemsList={processSteps}
-                                        addItem={() => addItem('processSteps', values.processSteps)}
-                                        removeItem={(value) => removeItem('processSteps', value)}
-                                        errorDescription={touched.processSteps && errors.processSteps ? errors.processSteps : ''}
-                                    />
+                                        <MultiItemsInput 
+                                            title='Etapas do processo'
+                                            getFormInput={() => {
+                                                return <FormInput
+                                                    type='text' name='processSteps' id='processSteps'
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    value={values.processSteps}
+                                                    showError={touched.processSteps && errors.processSteps}
+                                                />
+                                            }}
+                                            itemsList={processSteps}
+                                            addItem={() => addItem('processSteps', values.processSteps)}
+                                            removeItem={(value) => removeItem('processSteps', value)}
+                                            errorDescription={touched.processSteps && errors.processSteps ? errors.processSteps : ''}
+                                        />
 
-                                    <MultiItemsInput 
-                                        title='Habilidades necessárias'
-                                        getFormInput={() => {
-                                            return <FormInput
-                                                type='text' name='necessarySkills' id='necessarySkills'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.necessarySkills}
-                                                showError={touched.necessarySkills && errors.necessarySkills}
-                                            />
-                                        }}
-                                        itemsList={necessarySkills}
-                                        addItem={() => addItem('necessarySkills', values.necessarySkills)}
-                                        removeItem={(value) => removeItem('necessarySkills', value)}
-                                        errorDescription={touched.necessarySkills && errors.necessarySkills ? errors.necessarySkills : ''}
-                                    />
+                                        <MultiItemsInput 
+                                            title='Habilidades necessárias'
+                                            getFormInput={() => {
+                                                return <FormInput
+                                                    type='text' name='necessarySkills' id='necessarySkills'
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    value={values.necessarySkills}
+                                                    showError={touched.necessarySkills && errors.necessarySkills}
+                                                />
+                                            }}
+                                            itemsList={necessarySkills}
+                                            addItem={() => addItem('necessarySkills', values.necessarySkills)}
+                                            removeItem={(value) => removeItem('necessarySkills', value)}
+                                            errorDescription={touched.necessarySkills && errors.necessarySkills ? errors.necessarySkills : ''}
+                                        />
 
-                                    <MultiItemsInput 
-                                        title='Experiência necessária'
-                                        getFormInput={() => {
-                                            return <FormInput
-                                                type='text' name='experienceNeeded' id='experienceNeeded'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.experienceNeeded}
-                                                showError={touched.experienceNeeded && errors.experienceNeeded}
-                                            />
-                                        }}
-                                        itemsList={experienceNeeded}
-                                        addItem={() => addItem('experienceNeeded', values.experienceNeeded)}
-                                        removeItem={(value) => removeItem('experienceNeeded', value)}
-                                        errorDescription={touched.experienceNeeded && errors.experienceNeeded ? errors.experienceNeeded : ''}
-                                    />
-                                    <PrincipalButton type='submit' text='GERAR PDF' onClick={() => generatePdfDocument(values.jobTitle, values.salary)} />
+                                        <MultiItemsInput 
+                                            title='Experiência necessária'
+                                            getFormInput={() => {
+                                                return <FormInput
+                                                    type='text' name='experienceNeeded' id='experienceNeeded'
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    value={values.experienceNeeded}
+                                                    showError={touched.experienceNeeded && errors.experienceNeeded}
+                                                />
+                                            }}
+                                            itemsList={experienceNeeded}
+                                            addItem={() => addItem('experienceNeeded', values.experienceNeeded)}
+                                            removeItem={(value) => removeItem('experienceNeeded', value)}
+                                            errorDescription={touched.experienceNeeded && errors.experienceNeeded ? errors.experienceNeeded : ''}
+                                        />
+                                    </MultiItemsInputsContainer>
+                                    <PrincipalButton type='submit' text='GERAR PDF' onClick={() => addJob(values.jobTitle, values.salary)} />
                                 </Container>
                             </Form>
                         )
@@ -299,7 +314,7 @@ function FormScreen() {
                     <PrincipalButton text='OK' onClick={handleCloseModal} />
                 </ModalBox>
             </Modal>   
-        </Container>
+        </>
     );
 }
 

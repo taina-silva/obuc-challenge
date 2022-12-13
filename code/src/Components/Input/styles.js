@@ -1,30 +1,38 @@
 import styled from 'styled-components';
 import CurrencyInput from 'react-currency-input-field';
 
-export const Column = styled.div`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+export const Container = styled.div`
+    width: 50%;
+
+    @media (max-width: 750px) {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 `;
 
-export const Row = styled.div`
+export const InputContainer = styled.div`
+    width: 100%;
+`;
+
+export const InputWithButton = styled.div`
     width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    align-items: center;
+
+    @media (max-width: 750px) {
+        justify-content: space-between;
+    }
 `;
 
 export const ItemsRow = styled.div`
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     margin-bottom: 3rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
 `;
 
 export const ItemContainer = styled.div`
@@ -44,6 +52,7 @@ export const ItemContainer = styled.div`
 `;
 
 export const CustomCurrencyInput = styled(CurrencyInput)`
+    width: 70%;
     font-size: 1.25rem;
     color: black;
     padding: 0.5rem;
@@ -52,10 +61,14 @@ export const CustomCurrencyInput = styled(CurrencyInput)`
     &::placeholder {
         color: #76b5c5;
     }
+
+    @media (max-width: 750px) {
+        width: 80%;
+    }
 `;
 
 export const FormInput = styled.input`
-    width: 100%;
+    width: 70%;
     color: black;    
     font-size: 1.25rem;
     padding: 0.5rem;
@@ -63,6 +76,10 @@ export const FormInput = styled.input`
     border-radius: 5px;
     &::placeholder {
         color: #76b5c5;
+    }
+
+    @media (max-width: 750px) {
+        width: 80%;
     }
 `;
 
@@ -77,7 +94,9 @@ export const InputTitle = styled.div`
 `;
 
 export const ErrorSpan = styled.div`
+    display: ${props => (props.showError ? 'block' : 'none')};
     width: 17.5rem;
+    height: 1.5rem;
     margin-top: 10px;
     font-size: 0.75rem;
     color: grey;
@@ -109,7 +128,11 @@ export const AddRemoveButton = styled.button`
 `;
 
 export const Divider = styled.hr`
-    width: 100%;
+    width: 80%;
     border-top: 1px solid #405cf5;
     margin-bottom: 2rem;
+
+    @media (max-width: 750px) {
+        width: 100%;
+    }
 `;

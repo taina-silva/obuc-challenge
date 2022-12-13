@@ -2,27 +2,66 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
     width: 100vw;
+    padding: 2rem 2rem 2rem 10rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1rem 2rem;
+
+    @media (max-width: 1024px) {
+        padding: 2rem 2rem 2rem 7rem;
+    }
+
+    @media (max-width: 800px) {
+        padding: 2rem 2rem 2rem 4.5rem;
+    }
+
+    @media (max-width: 750px) {
+        padding: 2rem;
+    }
 `;
 
 export const Column = styled.div`
+    width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    align-items: space-between;
 `;
 
-export const Row = styled.div`
+export const FirstSection = styled.div`
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+
+    @media (max-width: 750px) {
+        flex-direction: column;
+    }
+`;
+
+export const MultiItemsInputsContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    @media (max-width: 750px) {
+        flex-direction: column;
+    }
+`;
+
+export const Title = styled.div`
+    width: 100%;
+    color: #ea4e73;
+    font-weight: bold;
+    font-size: 1.7rem;
+    margin-bottom: 3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
 `;
 
 export const ModalBox = styled.div`

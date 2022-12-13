@@ -20,7 +20,7 @@ export const Button = styled.button`
     }
 
     @media (min-width: 2560px) {
-        width: '20rem';
+        width: 20rem;
         font-size: 1.5rem;
     }
 `;

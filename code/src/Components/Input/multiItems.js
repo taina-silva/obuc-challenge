@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Column,
-    Row,
+    Container,
+    InputWithButton,
+    InputContainer,
     ItemsRow,
     ItemContainer,
     InputTitle,
@@ -13,23 +14,25 @@ import {
 
 function MultiItemsInput({title, getFormInput, itemsList, addItem, removeItem, errorDescription}) {
     return (
-        <Column>
+        <Container>
             <Divider />
-            <InputTitle>{title}</InputTitle>
-            <Row>
-                {getFormInput()}
-                <AddRemoveButton type='button' onClick={addItem}>+</AddRemoveButton>
-            </Row>                                    
-            <ErrorSpan>{errorDescription}</ErrorSpan>
-            <ItemsRow>                
-                {itemsList.map((a) => (
-                    <ItemContainer key={a}>
-                        <p>{a}</p>
-                        <AddRemoveButton type='button' onClick={() => removeItem(a)}>-</AddRemoveButton>
-                    </ItemContainer>
-                ))}
-            </ItemsRow>
-        </Column>
+            <InputContainer>
+                <InputTitle>{title}</InputTitle>
+                <InputWithButton>
+                    {getFormInput()}
+                    <AddRemoveButton type='button' onClick={addItem}>+</AddRemoveButton>
+                </InputWithButton>  
+                    <ErrorSpan showError={errorDescription === undefined}>{errorDescription}</ErrorSpan>
+                <ItemsRow>                
+                    {itemsList.map((a) => (
+                        <ItemContainer key={a}>
+                            <p>{a}</p>
+                            <AddRemoveButton type='button' onClick={() => removeItem(a)}>-</AddRemoveButton>
+                        </ItemContainer>
+                    ))}
+                </ItemsRow>
+            </InputContainer>            
+        </Container>
     );
 }
 
@@ -39,7 +42,7 @@ MultiItemsInput.propTypes = {
     itemsList: PropTypes.arrayOf(String).isRequired,
     addItem: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
-    errorDescription: PropTypes.string.isRequired,
+    errorDescription: PropTypes.string,
 };
 
 export default MultiItemsInput;
