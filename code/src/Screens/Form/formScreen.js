@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
-import { ThreeDots } from 'react-loader-spinner';
 import Modal from '@material-ui/core/Modal';
+import { MenuItem } from '@material-ui/core';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import PrincipalButton from '../../Components/Button/principalButton';
@@ -21,6 +21,7 @@ import {
 } from './styles';
 import {
     FormInput,
+    InputSelect,
     CustomCurrencyInput,
     InputTitle,
     ErrorSpan,
@@ -29,102 +30,72 @@ import {
 function FormScreen() {
     const navigate = useNavigate();
     const [ openModal, setOpenModal ] = useState(false);
-    const [ isLoading, setIsLoading ] = useState(false);
-    const [ modalDescription, setModalDescription ] = useState('');
-    const [ activities, setActivities ] = useState([]);
-    const [ benefits, setBenefits ] = useState([]);
-    const [ processSteps, setProcessSteps ] = useState([]);
-    const [ necessarySkills, setNecessarySkills ] = useState([]);
-    const [ experienceNeeded, setExperienceNeeded ] = useState([]);
-
+    const [ allJobsSpecifications, setAllJobsSpecifications ] = useState({});
+    const [ jobSpecifications, setJobSpecifications ] = useState({
+        jobTitle: '',
+        salary: 0,
+        activities: [],
+        benefits: [],
+        processSteps: [],
+        necessarySkills: [],
+        experienceNeeded: [],
+    });
     const validationSchema = Yup.object({
         jobTitle: Yup.string().required('Campo obrigatório'),
         salary: Yup.string().required('Campo obrigatório'),                    
     });
 
-    function handleSubmit(values) {
-        setIsLoading(true);
-        fetch('http://localhost:3001/users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
-        })
+    const getAllJobs = useCallback(() => {
+        fetch('http://localhost:3001')
         .then(response => {
-            getModalDescription(response).then(() => setIsLoading(false));
-            handleOpenModal();
+            return response.text();
+        })
+        .then(data => {
+            if(JSON.parse(data).code === 'ECONNREFUSED' || data.error) 
+                console.log(data.error);
+            else setAllJobsSpecifications(JSON.parse(data));
         });
-    }
+    }, []);
 
-    const handleOpenModal = () => {
-        setOpenModal(true);
-    };
-    
-    const handleCloseModal = () => {
-        setOpenModal(false);
-        navigate('/');
-    };
+    useEffect(() => {
+        getAllJobs();
+    }, [getAllJobs]);
 
-    async function getModalDescription(response) {
-        var result = 'Resultado inesperado';
-        if(response !== undefined ) {
-            const body = await response.clone().text();
-            const bodyAsJson = JSON.parse(body);
-            if(response.status > 299) {
-                if(bodyAsJson.detail.includes('already exists')) {
-                    if (bodyAsJson.detail.includes('email')) result = 'Email já está em uso. Por favor insira outro';
-                    else if (bodyAsJson.detail.includes('username')) result = 'Nome de usuário já está em uso. Por favor insira outro';
-                } else result = 'Erro ao cadastrar usuário';
-            }
-            if(response.status >= 200 && response.status <= 299) result = 'Usuário cadastrado com sucesso';
-        } 
-        setModalDescription(result);
-    }
+    function updateJobSpecifications(jobTitle) {
+        if(jobTitle && jobTitle !== '') {
+            const temp = JSON.parse(JSON.stringify(allJobsSpecifications[jobTitle]));
+            temp['jobTitle'] = jobTitle;
+            setJobSpecifications(temp);
+        }
+        else setJobSpecifications({
+            jobTitle: '',
+            salary: 0,
+            activities: [],
+            benefits: [],
+            processSteps: [],
+            necessarySkills: [],
+            experienceNeeded: [],
+        })
+    } 
 
     function addItem(id, value) {
-        const getSet = {
-            activities: () => { if(!activities.includes(value)) setActivities(activities.concat(value)) },
-            benefits: () => { if(!benefits.includes(value)) setBenefits(benefits.concat(value)) },
-            processSteps: () => { if(!processSteps.includes(value)) setProcessSteps(processSteps.concat(value)) },
-            necessarySkills: () => { if(!necessarySkills.includes(value)) setNecessarySkills(necessarySkills.concat(value)) },
-            experienceNeeded: () => { if(!experienceNeeded.includes(value)) setExperienceNeeded(experienceNeeded.concat(value)) },
+        if(!jobSpecifications[id].includes(value)) {
+            const temp = JSON.parse(JSON.stringify(jobSpecifications));
+            temp[id] = jobSpecifications[id].concat(value);
+            setJobSpecifications(temp);
         }
-        getSet[id]();
     }
 
     function removeItem(id, value) {
-        const getSet = {
-            activities: () => setActivities(activities.filter(function(a) { 
-                return a !== value
-            })),
-            benefits: () => setBenefits(benefits.filter(function(a) { 
-                return a !== value
-            })),
-            processSteps: () => setProcessSteps(processSteps.filter(function(a) { 
-                return a !== value
-            })),
-            necessarySkills: () => setNecessarySkills(necessarySkills.filter(function(a) { 
-                return a !== value
-            })),
-            experienceNeeded: () => setExperienceNeeded(experienceNeeded.filter(function(a) { 
-                return a !== value
-            })),
-        }
-        getSet[id]();
+        const tempArray = jobSpecifications[id].filter(function(a) { 
+            return a !== value
+        })
+        const tempObject = JSON.parse(JSON.stringify(jobSpecifications));;
+        tempObject[id] = tempArray;
+        setJobSpecifications(tempObject);
     }
 
-    const addJob = async (jobTitle, salary) => {
-        const jobSpecifications = {
-            jobTitle: jobTitle,
-            salary: salary,
-            activities: activities,
-            benefits: benefits,
-            processSteps: processSteps,
-            necessarySkills: necessarySkills,
-            experienceNeeded: experienceNeeded,
-        };
-        
+    const handleSubmit = async () => {   
         fetch('http://localhost:3001/jobs', {
             method: 'POST',
             headers: {
@@ -132,9 +103,11 @@ function FormScreen() {
             },
             body: JSON.stringify(jobSpecifications),
         })
-        .then((response) => {
-            // generatePdfDocument(jobSpecifications).then(() => {});
-        });
+        .then(() => {
+            generatePdfDocument(jobSpecifications).then(() => {})
+            .catch(() => handleOpenModal());
+            navigate('/');            
+        }).catch(() => handleOpenModal());
     };
 
     const generatePdfDocument = async (jobSpecifications) => {
@@ -145,18 +118,19 @@ function FormScreen() {
         saveAs(blob, 'formulario-vaga.pdf');
     };
 
+    const handleOpenModal = () => {
+        setOpenModal(true);
+    };
+    
+    const handleCloseModal = () => {
+        setOpenModal(false);
+        navigate('/');
+    };
+
     return (
         <>
             <Formik
-                initialValues = {{
-                    jobTitle: '',
-                    salary: '',
-                    activities: '',
-                    benefits: '',
-                    processSteps: '',
-                    necessarySkills: '',
-                    experienceNeeded: '',
-                }}
+                initialValues = {jobSpecifications}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
             >
@@ -178,20 +152,45 @@ function FormScreen() {
                                     <FirstSection>
                                         <Column>
                                             <InputTitle>Título do cargo</InputTitle>
-                                            <FormInput
-                                                type='text' name='jobTitle' id='jobTitle'
-                                                onChange={(e) => setFieldValue('jobTitle', e.target.value)}
-                                                onBlur={handleBlur}
-                                                value={values.jobTitle}
-                                                showError={touched.jobTitle && errors.jobTitle}
-                                            />
-                                            <ErrorSpan showError={touched.jobTitle && errors.jobTitle}>{errors.jobTitle}</ErrorSpan>
+                                            { Object.keys(allJobsSpecifications).length > 0 &&
+                                                <Column>
+                                                    <p style={{ margin: '10px 0' }} >Escolha entre vagas já cadastradas anteriormente...</p>
+                                                    <InputSelect
+                                                        name='jobTitle' id='jobTitle'
+                                                        value={values.jobTitle}
+                                                        label="Título da vaga"
+                                                        onChange={(e) => {
+                                                            setFieldValue('jobTitle', e.target.value)
+                                                            updateJobSpecifications(e.target.value);
+                                                        }}
+                                                    >
+                                                        {Object.keys(allJobsSpecifications).map((k) => (
+                                                            <MenuItem key={k} value={k}>{k}</MenuItem>
+                                                        ))}
+                                                    </InputSelect>
+                                                </Column>
+                                            }                                            
+                                            
+                                            <Column>
+                                                { Object.keys(allJobsSpecifications).length > 0 &&
+                                                    <p style={{ marginBottom: '5px' }} >Ou insira uma nova</p>
+                                                }
+                                                <FormInput
+                                                    type='text' name='jobTitle' id='jobTitle'
+                                                    value={values.jobTitle}
+                                                    onChange={(e) => setFieldValue('jobTitle', e.target.value)}
+                                                    onBlur={handleBlur}
+                                                    showError={touched.jobTitle && errors.jobTitle}
+                                                />
+                                                <ErrorSpan showError={touched.jobTitle && errors.jobTitle}>{errors.jobTitle}</ErrorSpan>
+                                            </Column>                                            
                                         </Column>
 
                                         <Column>
                                             <InputTitle>Salário</InputTitle>
                                             <CustomCurrencyInput
                                                 name='salary' id='salary'
+                                                value={jobSpecifications.salary}
                                                 onValueChange={(value) => setFieldValue('salary', value)}
                                                 prefix='R$ '
                                                 decimalSeparator=',' 
@@ -214,7 +213,7 @@ function FormScreen() {
                                                     showError={touched.activities && errors.activities}
                                                 />
                                             }}
-                                            itemsList={activities}
+                                            itemsList={jobSpecifications.activities}
                                             addItem={() => addItem('activities', values.activities)}
                                             removeItem={(value) => removeItem('activities', value)}
                                             errorDescription={touched.activities && errors.activities ? errors.activities : ''}
@@ -231,7 +230,7 @@ function FormScreen() {
                                                     showError={touched.benefits && errors.benefits}
                                                 />
                                             }}
-                                            itemsList={benefits}
+                                            itemsList={jobSpecifications.benefits}
                                             addItem={() => addItem('benefits', values.benefits)}
                                             removeItem={(value) => removeItem('benefits', value)}
                                             errorDescription={touched.benefits && errors.benefits ? errors.benefits : ''}
@@ -248,7 +247,7 @@ function FormScreen() {
                                                     showError={touched.processSteps && errors.processSteps}
                                                 />
                                             }}
-                                            itemsList={processSteps}
+                                            itemsList={jobSpecifications.processSteps}
                                             addItem={() => addItem('processSteps', values.processSteps)}
                                             removeItem={(value) => removeItem('processSteps', value)}
                                             errorDescription={touched.processSteps && errors.processSteps ? errors.processSteps : ''}
@@ -265,7 +264,7 @@ function FormScreen() {
                                                     showError={touched.necessarySkills && errors.necessarySkills}
                                                 />
                                             }}
-                                            itemsList={necessarySkills}
+                                            itemsList={jobSpecifications.necessarySkills}
                                             addItem={() => addItem('necessarySkills', values.necessarySkills)}
                                             removeItem={(value) => removeItem('necessarySkills', value)}
                                             errorDescription={touched.necessarySkills && errors.necessarySkills ? errors.necessarySkills : ''}
@@ -282,13 +281,13 @@ function FormScreen() {
                                                     showError={touched.experienceNeeded && errors.experienceNeeded}
                                                 />
                                             }}
-                                            itemsList={experienceNeeded}
+                                            itemsList={jobSpecifications.experienceNeeded}
                                             addItem={() => addItem('experienceNeeded', values.experienceNeeded)}
                                             removeItem={(value) => removeItem('experienceNeeded', value)}
                                             errorDescription={touched.experienceNeeded && errors.experienceNeeded ? errors.experienceNeeded : ''}
                                         />
                                     </MultiItemsInputsContainer>
-                                    <PrincipalButton type='submit' text='GERAR PDF' onClick={() => addJob(values.jobTitle, values.salary)} />
+                                    <PrincipalButton type='submit' text='GERAR PDF' onClick={() => handleSubmit(values.jobTitle, values.salary)} />
                                 </Container>
                             </Form>
                         )
@@ -301,16 +300,7 @@ function FormScreen() {
             >
                 <ModalBox>
                     <ModalTitle>ALERTA</ModalTitle>
-                    {isLoading ? (
-                        <ThreeDots 
-                        height='40' 
-                        width='80' 
-                        radius='9'
-                        color='blue' 
-                        ariaLabel='three-dots-loading'
-                        visible={true}
-                         />
-                    ) : (<ModalDescription>{modalDescription}</ModalDescription>)}
+                    <ModalDescription>Erro ao gerar documento</ModalDescription>
                     <PrincipalButton text='OK' onClick={handleCloseModal} />
                 </ModalBox>
             </Modal>   

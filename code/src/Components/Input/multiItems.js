@@ -6,6 +6,7 @@ import {
     InputContainer,
     ItemsRow,
     ItemContainer,
+    Itemtext,
     InputTitle,
     ErrorSpan,
     AddRemoveButton,
@@ -26,7 +27,7 @@ function MultiItemsInput({title, getFormInput, itemsList, addItem, removeItem, e
                 <ItemsRow>                
                     {itemsList.map((a) => (
                         <ItemContainer key={a}>
-                            <p>{a}</p>
+                            <Itemtext>{a}</Itemtext>
                             <AddRemoveButton type='button' onClick={() => removeItem(a)}>-</AddRemoveButton>
                         </ItemContainer>
                     ))}

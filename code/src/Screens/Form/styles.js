@@ -13,10 +13,6 @@ export const Container = styled.div`
     }
 
     @media (max-width: 800px) {
-        padding: 2rem 2rem 2rem 4.5rem;
-    }
-
-    @media (max-width: 750px) {
         padding: 2rem;
     }
 `;
@@ -27,6 +23,7 @@ export const Column = styled.div`
     flex-direction: column;
     justify-content: space-between;
     align-items: space-between;
+    color: grey;
 `;
 
 export const FirstSection = styled.div`
@@ -34,11 +31,16 @@ export const FirstSection = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+    align-items: flex-end;
+    margin: 2rem 0 0 0;
+
+    @media (max-width: 800px) {
+        align-items: flex-start;
+    }
 
     @media (max-width: 750px) {
         flex-direction: column;
+        margin-bottom: 2rem;
     }
 `;
 

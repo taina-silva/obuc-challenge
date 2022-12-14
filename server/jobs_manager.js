@@ -1,5 +1,4 @@
 const Pool = require('pg').Pool;
-var SqlString = require('sqlstring');
 
 const db_pool = new Pool({
   user: 'postgres',
