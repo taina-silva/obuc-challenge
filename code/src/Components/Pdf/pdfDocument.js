@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
 
 function JobPdfDocument(props) {
   const { jobTitle, salary, activities, benefits, processSteps, necessarySkills, experienceNeeded } = props.jobSpecifications;
-  
+
   return (
     <Document>
         <Page style={styles.page}>
@@ -62,7 +62,7 @@ function JobPdfDocument(props) {
             <View style={styles.column}>
               <Text style={styles.title} fixed>Atividades a serem exercidas:</Text>
               {activities.map((a) => (
-                <View style={styles.row}>
+                <View key={a} style={styles.row}>
                   <Text style={styles.ul}>-</Text>
                   <Text style={styles.text}>{a}</Text>
                 </View>
@@ -73,7 +73,7 @@ function JobPdfDocument(props) {
             <View style={styles.column}>
               <Text style={styles.title} fixed>Benefícios do cargo:</Text>
               {benefits.map((a) => (
-                <View style={styles.row}>
+                <View key={a} style={styles.row}>
                   <Text style={styles.ul}>-</Text>
                   <Text style={styles.text}>{a}</Text>
                 </View>
@@ -84,7 +84,7 @@ function JobPdfDocument(props) {
             <View style={styles.column}>
               <Text style={styles.title} fixed>Etapas do processo:</Text>
               {processSteps.map((a) => (
-                <View style={styles.row}>
+                <View key={a} style={styles.row}>
                   <Text style={styles.ul}>-</Text>
                   <Text style={styles.text}>{a}</Text>
                 </View>
@@ -95,7 +95,7 @@ function JobPdfDocument(props) {
             <View style={styles.column}>
               <Text style={styles.title} fixed>Habilidades necessárias:</Text>
               {necessarySkills.map((a) => (
-                <View style={styles.row}>
+                <View key={a} style={styles.row}>
                   <Text style={styles.ul}>-</Text>
                   <Text style={styles.text}>{a}</Text>
                 </View>
@@ -106,7 +106,7 @@ function JobPdfDocument(props) {
             <View style={styles.column}>
               <Text style={styles.title} fixed>Experiência necessária:</Text>
               {experienceNeeded.map((a) => (
-                <View style={styles.row}>
+                <View key={a} style={styles.row}>
                   <Text style={styles.ul}>-</Text>
                   <Text style={styles.text}>{a}</Text>
                 </View>
@@ -118,16 +118,18 @@ function JobPdfDocument(props) {
   )
 };
 
+const jobSpecificationsShape = {
+  jobTitle: PropTypes.string.isRequired,
+  salary: PropTypes.number.isRequired,
+  activities: PropTypes.arrayOf(String).isRequired,
+  benefits: PropTypes.arrayOf(String).isRequired,
+  processSteps: PropTypes.arrayOf(String).isRequired,
+  necessarySkills: PropTypes.arrayOf(String).isRequired,
+  experienceNeeded: PropTypes.arrayOf(String).isRequired,
+}
+
 JobPdfDocument.propTypes = {
-  jobSpecifications: PropTypes.objectOf({
-    jobTitle: PropTypes.string.isRequired,
-    salary: PropTypes.string.isRequired,
-    activities: PropTypes.arrayOf(String).isRequired,
-    benefits: PropTypes.arrayOf(String).isRequired,
-    processSteps: PropTypes.arrayOf(String).isRequired,
-    necessarySkills: PropTypes.arrayOf(String).isRequired,
-    experienceNeeded: PropTypes.arrayOf(String).isRequired,
-  }).isRequired,
+  jobSpecifications: PropTypes.objectOf(PropTypes.shape(jobSpecificationsShape))
 };
 
 export default JobPdfDocument;

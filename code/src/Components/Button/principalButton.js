@@ -6,7 +6,7 @@ import {
 
 function PrincipalButton(props) {
     return (
-      <Button onClick={props.onClick} >{props.text}</Button>
+      <Button type='submit' onClick={props.onClick} >{props.text}</Button>
     );
 }
 

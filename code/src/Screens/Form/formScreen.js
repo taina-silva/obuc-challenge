@@ -61,15 +61,18 @@ function FormScreen() {
         getAllJobs();
     }, [getAllJobs]);
 
-    function updateJobSpecifications(jobTitle) {
-        if(jobTitle && jobTitle !== '') {
-            const temp = JSON.parse(JSON.stringify(allJobsSpecifications[jobTitle]));
+    function updateJobSpecifications(jobTitle, salary) {
+        const considerJobTitle = jobTitle && jobTitle !== '';
+        const temp = JSON.parse(JSON.stringify((considerJobTitle && allJobsSpecifications[jobTitle]) ? allJobsSpecifications[jobTitle] : jobSpecifications));
+
+        if(considerJobTitle) {
             temp['jobTitle'] = jobTitle;
+            if(salary) temp['salary'] = salary;
             setJobSpecifications(temp);
         }
         else setJobSpecifications({
             jobTitle: '',
-            salary: 0,
+            salary: salary ?? 0,
             activities: [],
             benefits: [],
             processSteps: [],
@@ -104,16 +107,15 @@ function FormScreen() {
             body: JSON.stringify(jobSpecifications),
         })
         .then(() => {
-            generatePdfDocument(jobSpecifications).then(() => {})
+            generatePdfDocument().then(() => {})
             .catch(() => handleOpenModal());
             navigate('/');            
         }).catch(() => handleOpenModal());
     };
 
-    const generatePdfDocument = async (jobSpecifications) => {
+    const generatePdfDocument = async () => {
         const blob = await pdf((
-            <JobPdfDocument jobSpecifications={jobSpecifications}
-            />
+            <JobPdfDocument jobSpecifications={jobSpecifications}/>
         )).toBlob();
         saveAs(blob, 'formulario-vaga.pdf');
     };
@@ -146,7 +148,7 @@ function FormScreen() {
                         setFieldValue
                     }) => {
                         return (
-                            <Form onSubmit={handleSubmit}>
+                            <Form>
                                 <Container>
                                     <Title>Formulário para divulgação de vaga</Title>
                                     <FirstSection>
@@ -191,7 +193,10 @@ function FormScreen() {
                                             <CustomCurrencyInput
                                                 name='salary' id='salary'
                                                 value={jobSpecifications.salary}
-                                                onValueChange={(value) => setFieldValue('salary', value)}
+                                                onValueChange={(value) => {
+                                                    setFieldValue('salary', value)
+                                                    updateJobSpecifications(values.jobTitle, value);
+                                                }}
                                                 prefix='R$ '
                                                 decimalSeparator=',' 
                                                 groupSeparator='.'
@@ -287,7 +292,7 @@ function FormScreen() {
                                             errorDescription={touched.experienceNeeded && errors.experienceNeeded ? errors.experienceNeeded : ''}
                                         />
                                     </MultiItemsInputsContainer>
-                                    <PrincipalButton type='submit' text='GERAR PDF' onClick={() => handleSubmit(values.jobTitle, values.salary)} />
+                                    <PrincipalButton type='submit' text='GERAR PDF' onClick={handleSubmit} />
                                 </Container>
                             </Form>
                         )
