@@ -24,11 +24,10 @@ app.get('/', (req, res) => {
     ])
     .then((response) => {
         const jobs_with_specifications = {};
-        function getSpecificationsOfJob(index, valueParam, scpecifications) {
-            const arrayAux = Array.from([]);
+        function getSpecificationsOfJob(index, valueParam, specifications) {
             response[index].value.forEach((value) => {
-                arrayAux.push(value[valueParam]);
-                jobs_with_specifications[value.job][scpecifications] = arrayAux;
+                jobs_with_specifications[value.job][specifications] 
+                    = Array.from(jobs_with_specifications[value.job][specifications]).concat(value[valueParam]);
             })
         }
 

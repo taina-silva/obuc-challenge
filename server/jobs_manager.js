@@ -23,19 +23,8 @@ const get_all_jobs = (queryText) => {
 const add_job = (body) => {
   const { jobTitle, salary, activities, benefits, processSteps, necessarySkills, experienceNeeded } = body;
 
-  function getStringFromArray(array) {
-    var string = 'ARRAY[';
-    Array.from(array).forEach((elem) => {
-      string = string + elem;
-      if(Array.from(array).indexOf(elem) !== Array.from(array).length - 1) string = string + ', '
-    })
-
-    return string.trimEnd() + ']::text[]'; 
-  }
-
   return new Promise(function(resolve, reject) {
     const sql = `SELECT obuc.add_job ($1, $2, $3, $4, $5, $6, $7)`;
-
     const params = [
       jobTitle, 
       parseFloat(salary),

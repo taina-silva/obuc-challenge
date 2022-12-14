@@ -11,6 +11,6 @@ STEPS TO DEPLOY:
 
 --- TERMINAL 3:
 
-- cd morpheus-challenge
-- npm install 
+- cd code
+- npm install --force
 - npm start

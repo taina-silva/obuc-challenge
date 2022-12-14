@@ -43,6 +43,31 @@ function FormScreen() {
     const validationSchema = Yup.object({
         jobTitle: Yup.string().required('Campo obrigatório'),
         salary: Yup.string().required('Campo obrigatório'),                    
+        activities: Yup.array().when([], {
+            is: () => jobSpecifications.activities.length > 0,
+            then: Yup.array().nullable(),
+            otherwise: Yup.array().min(1, 'Especifique ao menos um item').nullable(),
+        }),
+        benefits: Yup.array().when([], {
+            is: () => jobSpecifications.benefits.length > 0,
+            then: Yup.array().nullable(),
+            otherwise: Yup.array().min(1, 'Especifique ao menos um item').nullable(),
+        }),
+        processSteps: Yup.array().when([], {
+            is: () => jobSpecifications.processSteps.length > 0,
+            then: Yup.array().nullable(),
+            otherwise: Yup.array().min(1, 'Especifique ao menos um item').nullable(),
+        }),
+        necessarySkills: Yup.array().when([], {
+            is: () => jobSpecifications.necessarySkills.length > 0,
+            then: Yup.array().nullable(),
+            otherwise: Yup.array().min(1, 'Especifique ao menos um item').nullable(),
+        }),
+        experienceNeeded: Yup.array().when([], {
+            is: () => jobSpecifications.experienceNeeded.length > 0,
+            then: Yup.array().nullable(),
+            otherwise: Yup.array().min(1, 'Especifique ao menos um item').nullable(),
+        })            
     });
 
     const getAllJobs = useCallback(() => {
@@ -64,7 +89,6 @@ function FormScreen() {
     function updateJobSpecifications(jobTitle, salary) {
         const considerJobTitle = jobTitle && jobTitle !== '';
         const temp = JSON.parse(JSON.stringify((considerJobTitle && allJobsSpecifications[jobTitle]) ? allJobsSpecifications[jobTitle] : jobSpecifications));
-
         if(considerJobTitle) {
             temp['jobTitle'] = jobTitle;
             if(salary) temp['salary'] = salary;
@@ -96,6 +120,7 @@ function FormScreen() {
         const tempObject = JSON.parse(JSON.stringify(jobSpecifications));;
         tempObject[id] = tempArray;
         setJobSpecifications(tempObject);
+        console.log(tempObject);
     }
 
     const handleSubmit = async () => {   
@@ -180,7 +205,10 @@ function FormScreen() {
                                                 <FormInput
                                                     type='text' name='jobTitle' id='jobTitle'
                                                     value={values.jobTitle}
-                                                    onChange={(e) => setFieldValue('jobTitle', e.target.value)}
+                                                    onChange={(e) => {
+                                                        setFieldValue('jobTitle', e.target.value)
+                                                        updateJobSpecifications(e.target.value);
+                                                    }}
                                                     onBlur={handleBlur}
                                                     showError={touched.jobTitle && errors.jobTitle}
                                                 />

@@ -151,11 +151,11 @@ $$ language 'plpgsql';
 select add_job(
 	'Confeitaria',
 	2500.00,
-	ARRAY['Mistura e preparação de massas', 'Abertura da doceria todas as manhãs', 'Organização da vitrine de forma atraente'],
-	ARRAY['Seguro de vida', 'Décimo terceiro', 'Convênio Bradesco Saúde'],
+	ARRAY['Mistura e preparação de massas', 'Abertura da doceria todas as manhãs', 'Organização da vitrine de forma atraente']::text[],
+	ARRAY['Seguro de vida', 'Décimo terceiro', 'Convênio Bradesco Saúde']::text[],
 	ARRAY['Enviar currículo', 'Enviar vídeo de apresentação', 'Apresentar execução de trabalho em data marcada']::text[],
-	ARRAY['Capacidade de ler e seguir as receitas', 'Boas habilidades organizacionais', 'Deve ser capaz de aderir às normas de saúde e segurança'],
-	ARRAY['Necessário ter ao menos 2 anos de experiência na área']
+	ARRAY['Capacidade de ler e seguir as receitas', 'Boas habilidades organizacionais', 'Deve ser capaz de aderir às normas de saúde e segurança']::text[],
+	ARRAY['Necessário ter ao menos 2 anos de experiência na área']::text[]
 );
 
 select * from obuc.jobs;
